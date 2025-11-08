@@ -10,13 +10,13 @@ avg_returns = log_returns.mean()
 #calculate covariance matrix
 cov_matrix = log_returns.cov() * 252
 
-
+num_of_sims = 2500
 #run monte carlo
 sims = pd.DataFrame({'Weights': [],
                      'Sharpe Ratio': [],
                      'Exp Return': [],
                      'Volatility': []})
-num_of_sims = 2500
+
 
 for i in range(num_of_sims):
     #random weights for stocks
@@ -27,15 +27,14 @@ for i in range(num_of_sims):
     #returns
     expected_annual_returns = np.sum((avg_returns * weights) * 252)
 
-    #variance calculation
-    variance = np.sqrt(
+    #vol calculation
+    volatility = np.sqrt(
     np.dot(
         weights.T, np.dot(cov_matrix, weights))
     )
 
-    new_sim = pd.DataFrame({'Weights': [weights],
-                     'Sharpe Ratio': [sharpe(expected_annual_returns, variance)],
-                     'Exp Return': [expected_annual_returns],
-                     'Volatility': [variance]})
-    sims = pd.concat([sims, new_sim], ignore_index=True)
+    sims = pd.concat([sims, pd.DataFrame({'Weights': [weights], 
+                                'Sharpe Ratio': [sharpe(expected_annual_returns, volatility)], 
+                                'Exp Return': [expected_annual_returns],
+                                'Volatility': [volatility]})])
 
