@@ -1,0 +1,41 @@
+import pandas as pd
+import numpy as np
+from stock_data_frames import stocks, number_of_stocks
+from Sharpe_Ratio import sharpe
+
+#Log returns, linearize in time
+log_returns = np.log(1+stocks.pct_change())
+avg_returns = log_returns.mean()
+
+#calculate covariance matrix
+cov_matrix = log_returns.cov() * 252
+
+
+#run monte carlo
+sims = pd.DataFrame({'Weights': [],
+                     'Sharpe Ratio': [],
+                     'Exp Return': [],
+                     'Volatility': []})
+num_of_sims = 2500
+
+for i in range(num_of_sims):
+    #random weights for stocks
+    weights = np.array(np.random.random(number_of_stocks))
+    #normalize
+    weights = weights / weights.sum()
+
+    #returns
+    expected_annual_returns = np.sum((avg_returns * weights) * 252)
+
+    #variance calculation
+    variance = np.sqrt(
+    np.dot(
+        weights.T, np.dot(cov_matrix, weights))
+    )
+
+    new_sim = pd.DataFrame({'Weights': [weights],
+                     'Sharpe Ratio': [sharpe(expected_annual_returns, variance)],
+                     'Exp Return': [expected_annual_returns],
+                     'Volatility': [variance]})
+    sims = pd.concat([sims, new_sim], ignore_index=True)
+
