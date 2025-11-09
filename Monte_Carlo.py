@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from stock_data_frames import stocks, number_of_stocks
+from stock_data_frames import stocks, number_of_stocks, tickers
 from Sharpe_Ratio import sharpe
 
 #Log returns, linearize in time
@@ -10,7 +10,7 @@ avg_returns = log_returns.mean()
 #calculate covariance matrix
 cov_matrix = log_returns.cov() * 252
 
-num_of_sims = 2500
+num_of_sims = 10000
 #run monte carlo
 sims = pd.DataFrame({'Weights': [],
                      'Sharpe Ratio': [],
@@ -38,3 +38,8 @@ for i in range(num_of_sims):
                                 'Exp Return': [expected_annual_returns],
                                 'Volatility': [volatility]})])
 
+best_sim = sims.iloc[sims['Sharpe Ratio'].idxmax()]
+print('Maximum Sharpe Ratio', sims['Sharpe Ratio'].max())
+print('Optimal Portfolio:')
+for i in range(len(tickers)):
+    print(f'{tickers[i]}: {round((best_sim.Weights[i])*100, 2)}%')
